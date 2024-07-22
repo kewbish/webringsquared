@@ -10,12 +10,14 @@
       <p>Loading...</p>
     </div>
     <footer>
-      <a href="https://example.com">← to previous</a>
+      <a href="#" id="previous-link" onClick="toPrevious">← to previous</a>
       <p>
         <a href="https://github.com/kewbish/webringsquared">webring²</a>, made
         by <a href="https://kewbi.sh">Kewbish</a>
       </p>
-      <a href="https://example.com" style="text-align: right">to next →</a>
+      <a href="#" style="text-align: right" id="next-link" onClick="toNext"
+        >to next →</a
+      >
     </footer>
   </body>
 </html>
@@ -111,12 +113,103 @@
     bottom: 0;
     padding: 0 20px;
   }
+
+  #previous-link,
+  #next-link {
+    visibility: hidden;
+  }
 </style>
 
 <script>
-  // get public ip from api.ipify.org
-  // try to get internal ip from webrtc connection
-  // fetch from function
-  // create iframe and set src
+  let urls = [];
+  let index = 0;
+
+  const initialize = async () => {
+    // get public ip from api.ipify.org
+    let ip = null;
+    try {
+      const ipifyResp = await fetch("https://api.ipify.org?format=json");
+      const ipifyJson = await ipifyResp.json();
+      ip = ipifyJson["ip"];
+    } catch (e) {
+      return;
+      // TODO - handle error
+    }
+    if (ip === null) {
+      return;
+      // TODO - handle error
+    }
+    // try to get private IP from webrtc connection
+    // adapted from https://www.dhiwise.com/post/how-to-retrieve-client-ip-address-in-javascript
+    let privateIP = null;
+    window.RTCPeerConnection =
+      window.RTCPeerConnection ||
+      window.mozRTCPeerConnection ||
+      window.webkitRTCPeerConnection;
+    var pc = new RTCPeerConnection({ iceServers: [] }),
+      noop = function () {};
+    pc.createDataChannel(""); // create a bogus data channel
+    pc.createOffer(pc.setLocalDescription.bind(pc), noop); // create offer and set local description
+    pc.onicecandidate = function (ice) {
+      if (ice && ice.candidate && ice.candidate.candidate) {
+        var myIP = /([0-9]{1,3}(\.[0-9]{1,3}){3})/.exec(
+          ice.candidate.candidate
+        )[1];
+        privateIP = myIP;
+        pc.onicecandidate = noop;
+      }
+    };
+    // fetch from function
+    const ipKey = privateIP === null ? ip : `{ip}:{privateIP}`;
+    let iframeUrl = "";
+    try {
+      const functionResp = await fetch("/progress");
+      const functionJson = await functionResp.json();
+      urls = functionJson["urls"];
+      index = functionJson["index"];
+      iframeUrl = functionJson["url"];
+    } catch (e) {
+      return;
+      // TODO - handle error
+    }
+    if (iframeUrl === "") {
+      return;
+      // TODO - handle error
+    }
+    // create iframe and set src
+    const iframeContainer = document.getElementById("iframe-container");
+    var iframe = document.createElement("iframe");
+    while (iframeContainer.firstChild) {
+      iframeContainer.removeChild(iframeContainer.firstChild);
+    }
+    iframe.src = iframeUrl;
+    iframe.style.border = "none";
+    iframe.style.width = "100%";
+    iframe.style.height = "100%";
+    iframeContainer.appendChild(iframe);
+    // show navigation links
+    document.getElementById("previous-link").style.visibility = "visible";
+    document.getElementById("next-link").style.visibility = "visible";
+  };
+
+  initialize();
+
   // rig up links to iterate over the urls (with modulo) onclick
+  const toPrevious = () => {
+    if (urls.length === 0) {
+      // TODO - handle error
+    }
+    document.querySelectorAll("iframe")[0].src =
+      urls[(index - 1) % urls.length];
+    index -= 1;
+  };
+
+  const toNext = () => {
+    if (urls.length === 0) {
+      // TODO - handle error
+    }
+    document.querySelectorAll("iframe")[0].src =
+      urls[(index + 1) % urls.length];
+    index += 1;
+  };
 </script>
