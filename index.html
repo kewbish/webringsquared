@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Webring²</title>
+  </head>
+  <body>
+    <div id="iframe-container">
+      <p>Loading...</p>
+    </div>
+    <footer>
+      <a href="https://example.com">← to previous</a>
+      <p>
+        <a href="https://github.com/kewbish/webringsquared">webring²</a>, made
+        by <a href="https://kewbi.sh">Kewbish</a>
+      </p>
+      <a href="https://example.com" style="text-align: right">to next →</a>
+    </footer>
+  </body>
+</html>
+
+<style>
+  :root {
+    --main-colour: #1e1e1e;
+    --sub-colour: #323232;
+    --dark-sub-colour: #2a2a2a;
+    --accent-colour: #b3a0de;
+    --dark-accent-colour: #7e68a9;
+    --light-accent-colour: #d3c4fd;
+    --muted-accent-colour: #efebf4;
+  }
+
+  @font-face {
+    font-display: swap;
+    font-family: "Source Sans 3";
+    font-style: normal;
+    font-weight: 400;
+    src: url(https://kewbi.sh/fonts/source-sans-3-v8-latin-regular.woff2)
+        format("woff2"),
+      url(https://kewbi.sh/fonts/source-sans-3-v8-latin-regular.woff)
+        format("woff");
+  }
+
+  #iframe-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--main-colour);
+  }
+
+  #iframe-container > p {
+    animation-name: pulse;
+    animation-duration: 2s;
+    animation-iteration-count: infinite;
+    animation-direction: alternate-reverse;
+    animation-timing-function: ease;
+    font-size: 100px;
+    color: var(--dark-accent-colour);
+  }
+
+  @keyframes pulse {
+    to {
+      color: var(--sub-colour);
+    }
+  }
+
+  * {
+    font-family: "Source Sans 3", sans-serif;
+  }
+
+  a {
+    color: #fff;
+    text-decoration: var(--accent-colour) underline;
+    -webkit-text-decoration: var(--accent-colour) underline;
+    transition: 0.5s;
+  }
+  a:hover {
+    color: var(--accent-colour);
+  }
+
+  html,
+  body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  #iframe-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  iframe {
+    flex: 1;
+    border: none;
+  }
+
+  footer {
+    height: max(2%, 50px);
+    background-color: var(--main-colour);
+    color: white;
+    text-align: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    bottom: 0;
+    padding: 0 20px;
+  }
+</style>
+
+<script>
+  // get public ip from api.ipify.org
+  // try to get internal ip from webrtc connection
+  // fetch from function
+  // create iframe and set src
+  // rig up links to iterate over the urls (with modulo) onclick
+</script>

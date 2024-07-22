@@ -1,0 +1,5 @@
+name = "webringsquared"
+
+[[kv_namespaces]]
+binding = "KV"
+id = "686b23ab7d2543089aa0a9ae46de3513"
