@@ -12,8 +12,8 @@
     <footer>
       <a href="#" id="previous-link" onClick="toPrevious()">← to previous</a>
       <p>
-        <a href="https://github.com/kewbish/webringsquared">webring²</a>, made
-        by <a href="https://kewbi.sh">Kewbish</a>
+        <a href="https://github.com/kewbish/webringsquared">webring²</a>, by
+        <a href="https://kewbi.sh">Kewbish</a>
       </p>
       <a href="#" style="text-align: right" id="next-link" onClick="toNext()"
         >to next →</a
@@ -123,6 +123,7 @@
 <script>
   let urls = [];
   let index = 0;
+  let ipKey = "";
 
   const fetchFromFunctionAndDisplay = async (privateIP) => {
     // get public ip from api.ipify.org
@@ -141,7 +142,8 @@
     }
 
     // fetch from function
-    const ipKey = privateIP === null ? ip : `${ip}:${privateIP}`;
+    // ipKey = privateIP === null ? ip : `${ip}:${privateIP}`; // :(
+    ipKey = ip;
     let iframeUrl = "";
     try {
       const functionResp = await fetch(`/progress/${ipKey}`, {
@@ -151,7 +153,6 @@
       urls = functionJson["urls"];
       index = functionJson["index"];
       iframeUrl = functionJson["url"];
-      console.log("Resp: ", functionJson);
     } catch (e) {
       console.error(e);
       return;
@@ -176,6 +177,7 @@
     document.getElementById("next-link").style.visibility = "visible";
   };
 
+  /*
   // try to get private IP from webrtc connection
   // adapted from https://github.com/natevw/ipcalf/blob/nginx/network_ip.html
   var RTCPeerConnection =
@@ -238,25 +240,35 @@
   } else {
     console.error("WebRTC connection initialization failed.");
   }
+  */
+  fetchFromFunctionAndDisplay("");
 
   // rig up links to iterate over the urls (with modulo) onclick
-  const toPrevious = () => {
+  const toPrevious = async () => {
     if (urls.length === 0) {
       console.error("Could not fetch webring URLs.");
       return;
     }
-    document.querySelectorAll("iframe")[0].src =
-      urls[(index - 1) % urls.length];
-    index -= 1;
+    if (ipKey === "") {
+      console.error("Hasn't fetched IP information yet.");
+      return;
+    }
+    index = (((index - 1) % urls.length) + urls.length) % urls.length;
+    document.querySelectorAll("iframe")[0].src = urls[index];
+    await fetch(`/progress/${ipKey}?set=${index}`);
   };
 
-  const toNext = () => {
+  const toNext = async () => {
     if (urls.length === 0) {
       console.error("Could not fetch webring URLs.");
       return;
     }
-    document.querySelectorAll("iframe")[0].src =
-      urls[(index + 1) % urls.length];
-    index += 1;
+    if (ipKey === "") {
+      console.error("Hasn't fetched IP information yet.");
+      return;
+    }
+    index = (((index + 1) % urls.length) + urls.length) % urls.length;
+    document.querySelectorAll("iframe")[0].src = urls[index];
+    await fetch(`/progress/${ipKey}?set=${index}`);
   };
 </script>

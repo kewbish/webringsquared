@@ -26,11 +26,27 @@ export const onRequestOptions = async () => {
 
 export const onRequest = async (context) => {
   const ipKey = context.params.ipkey;
+  const queryParams = new URL(context.request.url).searchParams;
+  if (queryParams.get("set") !== null) {
+    let hasIndexToSet = Number.parseInt(queryParams.get("set"));
+    if (Number.isNaN(hasIndexToSet)) {
+      return new Response({ status: 400 });
+    }
+    hasIndexToSet %= WEBRING_URLS.length;
+    await context.env.KV.put(ipKey, hasIndexToSet);
+    return new Response({ status: 200 });
+  }
   let index = await context.env.KV.get(ipKey);
   if (index === null) {
     index = 0;
   } else {
-    index = (index + 1) % WEBRING_URLS.length;
+    index = Number.parseInt(index);
+    if (Number.isNaN(index)) {
+      return new Response({ status: 400 });
+    }
+    index =
+      (((index + 1) % WEBRING_URLS.length) + WEBRING_URLS.length) %
+      WEBRING_URLS.length;
   }
   await context.env.KV.put(ipKey, index);
   const url = WEBRING_URLS[index];
@@ -39,6 +55,5 @@ export const onRequest = async (context) => {
   );
   response.headers.set("Access-Control-Allow-Origin", "*");
   response.headers.set("Access-Control-Max-Age", "86400");
-  response.headers.set("Content-Type", "application/json");
   return response;
 };
