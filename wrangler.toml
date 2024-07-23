@@ -1,4 +1,5 @@
 name = "webringsquared"
+pages_build_output_dir = "src/"
 
 [[kv_namespaces]]
 binding = "KV"

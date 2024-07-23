@@ -25,20 +25,20 @@ export const onRequestOptions = async () => {
 };
 
 export const onRequest = async (context) => {
-  const body = await context.request.json();
-  const ip_key = body["ip_key"];
-  let index = await context.env.KV.get(ip_key);
+  const ipKey = context.params.ipkey;
+  let index = await context.env.KV.get(ipKey);
   if (index === null) {
     index = 0;
   } else {
     index = (index + 1) % WEBRING_URLS.length;
   }
-  await context.env.KV.put(ip_key, index);
+  await context.env.KV.put(ipKey, index);
   const url = WEBRING_URLS[index];
   var response = new Response(
     JSON.stringify({ url, index, urls: WEBRING_URLS })
   );
   response.headers.set("Access-Control-Allow-Origin", "*");
   response.headers.set("Access-Control-Max-Age", "86400");
+  response.headers.set("Content-Type", "application/json");
   return response;
 };
