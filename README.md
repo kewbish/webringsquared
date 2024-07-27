@@ -9,5 +9,4 @@ Webring² is a little webring site that's linked to on a NFC ring. It advances t
 
 View a demo here:
 
-https://github.com/user-attachments/assets/5dd4b5d0-81e6-4196-a140-14e83ec9f8d0
-
+https://github.com/user-attachments/assets/0d54fa1d-c8c1-447f-80c4-9fa6e20035cd
